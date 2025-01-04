@@ -6,17 +6,17 @@ use helix_core::hashmap;
 
 pub fn default() -> HashMap<Mode, KeyTrie> {
     let normal = keymap!({ "Normal mode"
-        "h" | "left" => move_char_left,
-        "j" | "down" => move_visual_line_down,
-        "k" | "up" => move_visual_line_up,
-        "l" | "right" => move_char_right,
+        "m" | "left" => move_char_left,
+        "n" | "down" => move_visual_line_down,
+        "e" | "up" => move_visual_line_up,
+        "i" | "right" => move_char_right,
 
         "t" => find_till_char,
-        "f" => find_next_char,
+        "s" => find_next_char, // new mnemonic: s/S = search
         "T" => till_prev_char,
-        "F" => find_prev_char,
-        "r" => replace,
-        "R" => replace_with_yanked,
+        "S" => find_prev_char,
+        "v" => replace, // new mnemonic: revise
+        "V" => replace_with_yanked,
         "A-." =>  repeat_last_motion,
 
         "~" => switch_case,
@@ -25,45 +25,51 @@ pub fn default() -> HashMap<Mode, KeyTrie> {
 
         "home" => goto_line_start,
         "end" => goto_line_end,
+        "M" => goto_line_start,
+        "I" => goto_line_end,
+        "^" => goto_first_nonwhitespace,
+        "$" => goto_line_end,
 
         "w" => move_next_word_start,
         "b" => move_prev_word_start,
-        "e" => move_next_word_end,
+        "f" => move_next_word_end, // new mnemonic: f/F = far word/WORD
 
         "W" => move_next_long_word_start,
         "B" => move_prev_long_word_start,
-        "E" => move_next_long_word_end,
+        "F" => move_next_long_word_end,
 
-        "v" => select_mode,
-        "G" => goto_line,
+        "r" => select_mode, // new mnemonic: r/R = range
+        "G" => goto_last_line, // old habits die hard
+        "j" => goto_line, // new mnemonic: jump
         "g" => { "Goto"
             "g" => goto_file_start,
             "e" => goto_last_line,
             "f" => goto_file,
-            "h" => goto_line_start,
-            "l" => goto_line_end,
-            "s" => goto_first_nonwhitespace,
+            "m" => goto_line_start,
+            "i" => goto_line_end,
+            "s" => select_regex,
+            "S" => split_selection,
             "d" => goto_definition,
             "D" => goto_declaration,
             "y" => goto_type_definition,
             "r" => goto_reference,
-            "i" => goto_implementation,
+            "I" => goto_implementation,
             "t" => goto_window_top,
             "c" => goto_window_center,
             "b" => goto_window_bottom,
             "a" => goto_last_accessed_file,
-            "m" => goto_last_modified_file,
+            "M" => goto_last_modified_file,
             "n" => goto_next_buffer,
             "p" => goto_previous_buffer,
-            "k" => move_line_up,
-            "j" => move_line_down,
+            // "e" => move_line_up, // why?
+            // "n" => move_line_down,
             "." => goto_last_modification,
             "w" => goto_word,
         },
         ":" => command_mode,
 
-        "i" => insert_mode,
-        "I" => insert_at_line_start,
+        "l" => insert_mode,
+        "L" => insert_at_line_start,
         "a" => append_mode,
         "A" => insert_at_line_end,
         "o" => open_below,
@@ -78,11 +84,11 @@ pub fn default() -> HashMap<Mode, KeyTrie> {
         "A-C" => copy_selection_on_prev_line,
 
 
-        "s" => select_regex,
+        // "s" => select_regex, // rebound under goto
         "A-s" => split_selection_on_newline,
         "A-minus" => merge_selections,
         "A-_" => merge_consecutive_selections,
-        "S" => split_selection,
+        // "S" => split_selection, // rebound under goto
         ";" => collapse_selection,
         "A-;" => flip_selections,
         "A-o" | "A-up" => expand_selection,
@@ -99,8 +105,8 @@ pub fn default() -> HashMap<Mode, KeyTrie> {
         "X" => extend_to_line_bounds,
         "A-x" => shrink_to_line_bounds,
 
-        "m" => { "Match"
-            "m" => match_brackets,
+        "k" => { "Knit" // new mnemonic: KNIT mode
+            "k" => match_brackets,
             "s" => surround_add,
             "r" => surround_replace,
             "d" => surround_delete,
@@ -138,8 +144,8 @@ pub fn default() -> HashMap<Mode, KeyTrie> {
 
         "/" => search,
         "?" => rsearch,
-        "n" => search_next,
-        "N" => search_prev,
+        "h" => search_next,
+        "H" => search_prev,
         "*" => search_selection_detect_word_boundaries,
         "A-*" => search_selection,
 
@@ -159,7 +165,7 @@ pub fn default() -> HashMap<Mode, KeyTrie> {
 
         ">" => indent,
         "<" => unindent,
-        "=" => format_selections,
+        // "=" => format_selections, moved under leader
         "J" => join_selections,
         "A-J" => join_selections_space,
         "K" => keep_selections,
@@ -171,7 +177,7 @@ pub fn default() -> HashMap<Mode, KeyTrie> {
         // "q" => record_macro,
         // "Q" => replay_macro,
 
-        "&" => align_selections,
+        "=" => align_selections,
         "_" => trim_selections,
 
         "(" => rotate_selections_backward,
@@ -182,8 +188,8 @@ pub fn default() -> HashMap<Mode, KeyTrie> {
         "A-:" => ensure_selections_forward,
 
         "esc" => normal_mode,
-        "C-b" | "pageup" => page_up,
-        "C-f" | "pagedown" => page_down,
+        "C-E" | "C-b" | "pageup" => page_up,
+        "C-N" | "C-f" | "pagedown" => page_down,
         "C-u" => page_cursor_half_up,
         "C-d" => page_cursor_half_down,
 
@@ -194,42 +200,44 @@ pub fn default() -> HashMap<Mode, KeyTrie> {
             "C-t" | "t" => transpose_view,
             "f" => goto_file_hsplit,
             "F" => goto_file_vsplit,
+            "C-k" | "k" => wclose,
             "C-q" | "q" => wclose,
             "C-o" | "o" => wonly,
-            "C-h" | "h" | "left" => jump_view_left,
-            "C-j" | "j" | "down" => jump_view_down,
-            "C-k" | "k" | "up" => jump_view_up,
-            "C-l" | "l" | "right" => jump_view_right,
-            "L" => swap_view_right,
-            "K" => swap_view_up,
-            "H" => swap_view_left,
-            "J" => swap_view_down,
-            "n" => { "New split scratch buffer"
-                "C-s" | "s" => hsplit_new,
-                "C-v" | "v" => vsplit_new,
-            },
+            "C-m" | "m" | "left" => jump_view_left,
+            "C-n" | "n" | "down" => jump_view_down,
+            "C-e" | "e" | "up" => jump_view_up,
+            "C-i" | "i" | "right" => jump_view_right,
+            "M" => swap_view_right,
+            "E" => swap_view_up,
+            "I" => swap_view_left,
+            "N" => swap_view_down,
+            // "n" => { "New split scratch buffer"
+            //     "C-s" | "s" => hsplit_new,
+            //     "C-v" | "v" => vsplit_new,
+            // },
         },
 
         // move under <space>c
-        "C-c" => toggle_comments,
+        // "C-c" => toggle_comments,
 
         // z family for save/restore/combine from/to sels from register
 
         "C-i" | "tab" => jump_forward, // tab == <C-i>
         "C-o" => jump_backward,
         "C-s" => save_selection,
+        "C-l" => align_view_top, // sorta like Emacs
 
         "space" => { "Space"
             "f" => file_picker,
             "F" => file_picker_in_current_directory,
-            "b" => buffer_picker,
+            "b" => { "Buffer"
+                "b" => buffer_picker,
+            },
+            "r" => { "Rapid"
+                "_" => no_op, // placeholder
+            },
             "j" => jumplist_picker,
-            "s" => symbol_picker,
-            "S" => workspace_symbol_picker,
-            "d" => diagnostics_picker,
-            "D" => workspace_diagnostics_picker,
             "g" => changed_file_picker,
-            "a" => code_action,
             "'" => last_picker,
             "G" => { "Debug (experimental)" sticky=true
                 "l" => dap_launch,
@@ -259,114 +267,136 @@ pub fn default() -> HashMap<Mode, KeyTrie> {
                 "C-t" | "t" => transpose_view,
                 "f" => goto_file_hsplit,
                 "F" => goto_file_vsplit,
+                "C-k" | "k" => wclose,
                 "C-q" | "q" => wclose,
                 "C-o" | "o" => wonly,
-                "C-h" | "h" | "left" => jump_view_left,
-                "C-j" | "j" | "down" => jump_view_down,
-                "C-k" | "k" | "up" => jump_view_up,
-                "C-l" | "l" | "right" => jump_view_right,
-                "H" => swap_view_left,
-                "J" => swap_view_down,
-                "K" => swap_view_up,
-                "L" => swap_view_right,
-                "n" => { "New split scratch buffer"
+                "C-m" | "m" | "left" => jump_view_left,
+                "C-n" | "n" | "down" => jump_view_down,
+                "C-e" | "e" | "up" => jump_view_up,
+                "C-i" | "i" | "right" => jump_view_right,
+                "M" => swap_view_left,
+                "E" => swap_view_down,
+                "N" => swap_view_up,
+                "I" => swap_view_right,
+                "b" => { "New split scratch buffer"
                     "C-s" | "s" => hsplit_new,
-                    "C-v" | "v" => vsplit_new,
+                    "C-b" | "b" | "C-v" | "v" => vsplit_new,
                 },
             },
             "y" => yank_to_clipboard,
             "Y" => yank_main_selection_to_clipboard,
-            "p" => paste_clipboard_after,
-            "P" => paste_clipboard_before,
             "R" => replace_selections_with_clipboard,
             "/" => global_search,
-            "k" => hover,
-            "r" => rename_symbol,
-            "h" => select_references_to_symbol_under_cursor,
-            "c" => toggle_comments,
-            "C" => toggle_block_comments,
-            "A-c" => toggle_line_comments,
             "?" => command_palette,
+            "c" => { "Comments"
+                "c" => toggle_comments,
+                "C" => toggle_block_comments,
+                "l" => toggle_line_comments,
+            },
+            "p" => { "Project"
+                "D" => workspace_diagnostics_picker,
+                "R" => select_references_to_symbol_under_cursor,
+                "S" => workspace_symbol_picker,
+                "a" => code_action,
+                "d" => diagnostics_picker,
+                "k" => hover,
+                "r" => rename_symbol,
+                "s" => symbol_picker,
+            },
+            "t" => { "Toggle"
+                "_" => no_op, // placeholder
+            },
+            "x" => { "Text manipulation"
+                "=" => format_selections,
+                "p" => paste_clipboard_after,
+                "P" => paste_clipboard_before,
+            },
+            "q" => { "Quit"
+                "_" => no_op, // placeholder
+            },
         },
         "z" => { "View"
             "z" | "c" => align_view_center,
             "t" => align_view_top,
             "b" => align_view_bottom,
             "m" => align_view_middle,
-            "k" | "up" => scroll_up,
-            "j" | "down" => scroll_down,
-            "C-b" | "pageup" => page_up,
-            "C-f" | "pagedown" => page_down,
+            "e" | "up" => scroll_up,
+            "n" | "down" => scroll_down,
+            "C-E" | "C-b" | "pageup" => page_up,
+            "C-N" | "C-f" | "pagedown" => page_down,
             "C-u" | "backspace" => page_cursor_half_up,
             "C-d" | "space" => page_cursor_half_down,
 
             "/" => search,
             "?" => rsearch,
-            "n" => search_next,
-            "N" => search_prev,
+            "h" => search_next,
+            "H" => search_prev,
         },
         "Z" => { "View" sticky=true
             "z" | "c" => align_view_center,
             "t" => align_view_top,
             "b" => align_view_bottom,
             "m" => align_view_middle,
-            "k" | "up" => scroll_up,
-            "j" | "down" => scroll_down,
-            "C-b" | "pageup" => page_up,
-            "C-f" | "pagedown" => page_down,
+            "e" | "up" => scroll_up,
+            "n" | "down" => scroll_down,
+            "C-E" | "C-b" | "pageup" => page_up,
+            "C-N" | "C-f" | "pagedown" => page_down,
             "C-u" | "backspace" => page_cursor_half_up,
             "C-d" | "space" => page_cursor_half_down,
 
             "/" => search,
             "?" => rsearch,
-            "n" => search_next,
-            "N" => search_prev,
+            "h" => search_next,
+            "H" => search_prev,
         },
 
-        "\"" => select_register,
+        "&" => select_register,
         "|" => shell_pipe,
         "A-|" => shell_pipe_to,
         "!" => shell_insert_output,
         "A-!" => shell_append_output,
-        "$" => shell_keep_pipe,
+        // "$" => shell_keep_pipe, // TODO rebind
         "C-z" => suspend,
 
-        "C-a" => increment,
-        "C-x" => decrement,
+        "+" => increment,
+        "minus" => decrement,
     });
     let mut select = normal.clone();
     select.merge_nodes(keymap!({ "Select mode"
-        "h" | "left" => extend_char_left,
-        "j" | "down" => extend_visual_line_down,
-        "k" | "up" => extend_visual_line_up,
-        "l" | "right" => extend_char_right,
+        "m" | "left" => extend_char_left,
+        "n" | "down" => extend_visual_line_down,
+        "e" | "up" => extend_visual_line_up,
+        "i" | "right" => extend_char_right,
+
+        "E" => page_cursor_half_up,
+        "N" => page_cursor_half_down,
 
         "w" => extend_next_word_start,
         "b" => extend_prev_word_start,
-        "e" => extend_next_word_end,
+        "f" => extend_next_word_end,
         "W" => extend_next_long_word_start,
         "B" => extend_prev_long_word_start,
-        "E" => extend_next_long_word_end,
+        "F" => extend_next_long_word_end,
 
         "A-e" => extend_parent_node_end,
         "A-b" => extend_parent_node_start,
 
-        "n" => extend_search_next,
-        "N" => extend_search_prev,
+        "h" => extend_search_next,
+        "H" => extend_search_prev,
 
         "t" => extend_till_char,
-        "f" => extend_next_char,
+        "s" => extend_next_char,
         "T" => extend_till_prev_char,
-        "F" => extend_prev_char,
+        "S" => extend_prev_char,
 
         "home" => extend_to_line_start,
         "end" => extend_to_line_end,
         "esc" => exit_select_mode,
 
-        "v" => normal_mode,
+        "r" => normal_mode,
         "g" => { "Goto"
-            "k" => extend_line_up,
-            "j" => extend_line_down,
+            "e" => extend_line_up,
+            "n" => extend_line_down,
             "w" => extend_to_word,
         },
     }));
