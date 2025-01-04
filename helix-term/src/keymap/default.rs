@@ -165,7 +165,6 @@ pub fn default() -> HashMap<Mode, KeyTrie> {
 
         ">" => indent,
         "<" => unindent,
-        // "=" => format_selections, moved under leader
         "J" => join_selections,
         "A-J" => join_selections_space,
         "K" => keep_selections,
@@ -211,14 +210,7 @@ pub fn default() -> HashMap<Mode, KeyTrie> {
             "E" => swap_view_up,
             "I" => swap_view_left,
             "N" => swap_view_down,
-            // "n" => { "New split scratch buffer"
-            //     "C-s" | "s" => hsplit_new,
-            //     "C-v" | "v" => vsplit_new,
-            // },
         },
-
-        // move under <space>c
-        // "C-c" => toggle_comments,
 
         // z family for save/restore/combine from/to sels from register
 
