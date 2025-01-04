@@ -42,6 +42,7 @@ pub fn default() -> HashMap<Mode, KeyTrie> {
         "G" => goto_last_line, // old habits die hard
         "j" => goto_line, // new mnemonic: jump
         "g" => { "Goto"
+            "a" => select_all,
             "g" => goto_file_start,
             "e" => goto_last_line,
             "f" => goto_file,
@@ -57,7 +58,7 @@ pub fn default() -> HashMap<Mode, KeyTrie> {
             "t" => goto_window_top,
             "c" => goto_window_center,
             "b" => goto_window_bottom,
-            "a" => goto_last_accessed_file,
+            "A" => goto_last_accessed_file,
             "M" => goto_last_modified_file,
             "n" => goto_next_buffer,
             "p" => goto_previous_buffer,
@@ -100,11 +101,11 @@ pub fn default() -> HashMap<Mode, KeyTrie> {
         "A-b" => move_parent_node_start,
         "A-a" => select_all_siblings,
 
-        "%" => select_all,
         "x" => extend_line_below,
         "X" => extend_to_line_bounds,
         "A-x" => shrink_to_line_bounds,
 
+        "%" => match_brackets, // easier reach on my keyboard due to layers
         "k" => { "Knit" // new mnemonic: KNIT mode
             "k" => match_brackets,
             "s" => surround_add,
