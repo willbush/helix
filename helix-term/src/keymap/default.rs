@@ -276,9 +276,6 @@ pub fn default() -> HashMap<Mode, KeyTrie> {
                     "C-b" | "b" | "C-v" | "v" => vsplit_new,
                 },
             },
-            "y" => yank_to_clipboard,
-            "Y" => yank_main_selection_to_clipboard,
-            "R" => replace_selections_with_clipboard,
             "/" => global_search,
             "?" => command_palette,
             "c" => { "Comments"
@@ -303,6 +300,9 @@ pub fn default() -> HashMap<Mode, KeyTrie> {
                 "=" => format_selections,
                 "p" => paste_clipboard_after,
                 "P" => paste_clipboard_before,
+                "y" => yank_to_clipboard,
+                "Y" => yank_main_selection_to_clipboard,
+                "R" => replace_selections_with_clipboard,
             },
             "q" => { "Quit"
                 "_" => no_op, // placeholder
